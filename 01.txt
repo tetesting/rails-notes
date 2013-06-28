@@ -1,0 +1,66 @@
+
+Databases and Rails
+
+Week 01 - Intro to course and Intro to PostgreSQL
+
+
+
+CRUD:
+  Create
+  Read
+  Update
+  Destroy
+
+PosgreSQL intro
+
+-- login to psql client:
+psql
+
+-- help
+help
+
+-- create database
+CREATE DATABASE data_testing;
+
+-- connect to database
+\c data_testing;
+
+-- create table
+CREATE TABLE users (
+ id serial,
+ PRIMARY KEY (id),
+ name varchar(255),
+ movie varchar(255),
+ number int
+);
+
+-- list tables
+\d
+
+-- list scehma of table
+\d users
+
+-- insert into table (create data)
+INSERT INTO users (name, movie, number) VALUES ('tam', 'the departed', 4);
+INSERT INTO users (name, movie, number) VALUES ('jane', 'tarzan', 5);
+
+-- look up data in table (reading data)
+SELECT * FROM users;
+
+-- find record that follows certain condition
+SELECT * FROM users WHERE movie='the departed';
+SELECT * FROM users WHERE number > 4;
+
+-- ask the database to give data about its runtime
+EXPLAIN ANALYZE SELECT * FROM users WHERE number > 4;
+
+-- note that it takes a fraction of a millisecond
+-- more records will increase the runtime
+
+
+
+
+
+
+
+

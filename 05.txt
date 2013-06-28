@@ -1,0 +1,220 @@
+Databases and Rails
+
+Week 05 - Controllers
+
+
+Recap Of what's happened thus far:
+1 Database Backed Models
+2 Ruby built views
+3 Route = HTTP Verb + URL
+   GET: for retrieving data
+   POST: for sending data
+
+-------
+
+:::: Lec 01 - Ruby's Variables
+
+::: Constants
+-start witha capital letter
+-All class names are constants
+
+::: Local variables 
+-start with a lower-case letter
+-exists within the scope that it is defined:
+  1 function blocks
+  2 do blocks
+  3 module blocks
+
+::: Instance variables
+-start with @ symbol
+-defined inside of classes, outside of methods
+-accessible within the methods of the class where it is defined
+
+-can be used to define global variables in a ruby file
+
+___ Always use the lowest scope possible
+  - Don't get @-itis
+
+
+
+:::: Lec 02 - Rails - Database Logic in Controllers 
+
+Controllers: specify the views we see, where we go, and what data is available
+
+
+RECALL...
+
+  get '/products'      =>          'Products#index'
+  <    route    >    maps to    < Controller # Action >
+
+In the last week, our controllers were blank while we put all of the logic into the views. --This was to make it easier to learn and get started with Rails routes
+
+BUT... it is much better (part of the raison d'etre of MVC frameworks) to put the database interactions into the controllers to keep the code organized, and to keep the functionality between views and models in separate areas
+
+ex. moving database interactions from view to controller
+
+:: app/views/products/index.html.erb ORIGINAL
+<h2>Products in the Market</h2>
+<% products = Product.includes(:user).all %>
+<ul>
+ <% products.each do |product| %>
+   <li>
+     Product Name: "<%= product.name %>" costs $<%= product.price %>
+    </li>
+  <% end %>
+</ul>
+
+:: app/controllers/products_controller.rb
+class ProductsController < ApplicationController
+  
+  def index
+    # only instance variables are visible to the view
+    @products = Product.includes(:user).all
+  end
+
+end
+
+:: app/views/products/index.html.erb CLEANED UP
+<h2>Products in the Market</h2>
+
+<ul>
+ <% @products.each do |product| %>
+   <li>
+     Product Name: "<%= product.name %>" costs $<%= product.price %>
+    </li>
+  <% end %>
+</ul>
+
+____SQL does not belong to the view!
+MVC:
+-Views are for presenting information, not for querying the database
+-Controllers query the database, run actions on the data, and pass them to the views
+-Models are the Ruby-class interface to the database, and the controllers interact with the database through models
+
+:::: Lec 03 - The other functions of Controllers: Render, Redirect, Filter, Format
+
+::: Render
+- can tell the methods of the controller to render a certain view
+ex.
+  def index
+    # ...
+    # does the default action (view name matches action name)
+    render "index.html.erb"
+  end
+  def somethingelse
+    # ...
+    # shorthand for "somethingelse.html.erb"
+    render :somethingelse
+  end
+  def anotherview
+    # ...
+    # you can render a view different from the action name
+    render :anythingyouwant
+  end
+  
+
+::: Redirect
+- redirect the client somewhere else instead of rendering a view
+ex.
+  def index
+    @products = Product.includes(:user).all
+    if @products.blank? { redirect_to "/products_empty" }
+  end
+
+
+::: Filter
+- allows you attach "filters" to different actions
+- keeps things clean in your code (usually to cut redundancy)
+ex.
+  # run this method before every action
+  before_filter :ensure_products_present
+
+  def index
+    @products = Product.includes(:user).all
+  end
+
+  def ensure_products_present
+    redirect_to "/" unless Product.count > 0
+  end
+
+
+::: Format
+- allows you to render pages of different formats
+ex. 
+  def index
+    @products = Product.includes(:user).all
+    respond_to do |format|
+      format.html   # renders index.html.erb
+      format.json {render :json => @products}  # renders a json file
+    end
+  end
+
+
+:::: Lec 04 - Rails URL Helpers
+
+Recall...
+# Generate an HTML link to "/products" with the text=="All Products" displayed
+<%= link_to "All Products", "/products" %>
+
+
+# to recall all routes of the application
+rake routes
+
+::: Route Anatomy: 
+    products        GET          /products(.:format)          products#index
+  <URL Helper>  <HTTP Verb>  <URL (with optional format)>  <Controller # Action>
+
+- URL helpers can help us build links for link_to
+  -we DO NOT want to hard-code links in our link_to's
+    - in case we change the URL of something, we can leave the URL unchanged in the views
+
+::: Using Path helpers:
+... <%= link_to "All Products", "/products" %> should be...
+<%= link_to "All Products", products_path %>
+
+another ex.
+... <%= link_to "Show", "/products/3" %> should be...
+<% @product = Product.where(:id => 3).first %>
+<%= link_to "show", product_path(@product) %>
+
+
+:: ... further more, you can rewrite <%= link_to "show", product_path(@product) %> as...
+<%= link_to "show", @product %>
+
+: features of link_to @product:
+
+ex1::
+<% @product = Product.new %>
+<span><%= @product.persisted? %></span>
+<%= link_to "a link", @product %>
+... outputs: 
+<span>false</span>
+<a href="/products">a link</a>
+
+ex2::
+<% @product = Product.where(:id =>99).first %>
+<span><%= @product.persisted %></span>
+<%= link_to "a link", @product %>
+... outputs: 
+<span>true</span>
+<a href="/products/99">a link</a>
+
+__ The state of @product changes the path
+
+
+:: Path Helper vs URL Helper:
+products_path               products_url
+new_product_path            new_product_url
+edit_product_url(@product)  edit_product_url(@product)
+product_url(@product)       product_url(@product)
+
+URL helper provides the FULL url
+Path helper uses the relative path
+
+
+
+
+
+
+
+

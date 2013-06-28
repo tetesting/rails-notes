@@ -1,0 +1,143 @@
+Databases and Rails
+
+Week 03 - Ruby, Servers, Views, Git
+
+
+Week 2 Recap:
+Created databases in Rails
+Added some data
+Queries
+Joins
+
+
+Week03
+
+::: Lec01 - Arrays
+
+pets = ['rex', 'nibbles', 'fred']
+pets.count
+pets.class
+
+:: Arrays have built-in iterators (since it is a subclass of enumerable)
+- no need for setting up loops
+
+: Array#each will pull out each value out of the array
+
+ex.
+pets.each do |pet|      # we specify the placeholder variable to be pet
+  puts "I love #{pet}"
+end
+
+: Array#map - allows us to build a new array from a given array along with some instructions
+newpets = pets.map do |pet|
+  pet.upcase
+end
+
+
+::: Lec02 - STDLib
+A set of common library functions
+You will have to 'require' them in your program to use them
+  ex. require 'date'
+  
+:: Date
+puts Date.today
+
+
+:: URI - Universal Resource Identifier  
+a URL (uniform resource locator) is a special type of URI
+-used to parse URLs to extract different sections from them (path names and such)
+
+----
+
+require 'uri'
+URI.parse("http://google.com").host
+ => "google.com"
+URI.parse("http://example.com/foo").path
+ => "foo"
+
+Don't just think about what libraries to use, think about the problem at hand and in your investigation you will find out which library will help
+
+
+
+
+::: Lec03 - HTML and ERB
+
+HTML: Open tags, close tags
+
+
+ERB (Embedded Ruby) - Ruby that is going to be embedded in some text file
+  -We shall embed Ruby into HTML files
+
+For output, use these tags: <%= some_variable %>
+For any other code, omit the '=': <% x = 2 + some_variable %>
+
+----
+
+require 'erb'
+x = 42
+template = ERB.new "The value of x is <%= x %>"
+puts template.result(binding)
+  # => The value of x is 42
+
+page_string = "
+<html>
+  <body>
+    <p>I am a web page. The time is now: <%= Time.now %></p>
+  </body>
+</html>"
+
+----
+:: Iterators in ERB
+<ul>
+  <% ['cats', 'dogs'].each do |pet| %>
+    <li><%= "#{pet} are great" %></li>
+  <% end %>
+</ul>"
+## Output:
+<ul>
+  <li>cats are great</li>
+  <li>dogs are great</li>
+</ul>
+----
+- we are automating the HTML that we are building
+- Rails uses ERB to generate views
+
+
+
+
+
+
+::: Lec 04 - Git
+# Version Control
+
+git init
+git add .
+git commit -m "Useful message describing commit"
+
+# make a change requires you to add the file to commit again
+git add .
+git commit
+
+# can roll back in time through the history of the project
+
+# git is a distributed VCS
+# can clone your git repository and transfer to to servers and other machines
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

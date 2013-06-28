@@ -1,0 +1,101 @@
+::: Git shit
+
+// initialize git repository in current directory
+$ git init
+
+// check status of current working set
+$ git status
+
+// add files to staging area
+$ git add .
+
+// commit
+$ git commit -m "place commit message here"
+
+// commit all modifications to existing files in the git repository
+// uses the -a flag (we don't have to use "git add ." again)
+$ git commit -a -m
+
+// check out git history
+$ git log
+
+// checkout previous version
+$ git checkout <first 5 letters of hash of revision (check the log)>
+
+// checkout the latest revision, overwriting any changes made since then
+$ git checkout -f
+
+// set up project's username and email:
+$ git config user.name "username"
+$ git config user.email "useremail"
+
+// add remote repository:
+$ git remote add origin git@github.com:<username>/<name_of_app>.git
+
+// push repository to remote server for the first time
+$ git push -u origin master
+
+// checkout a branch (creates one if it does not exist):
+$ git checkout -b name-of-branch
+
+// check current branch
+$ git branch
+
+// mv a file within repository
+$ git mv oldname.oldext newname.newext
+
+// commit all modifications to existing files in the git repository (including files renamed/moved)
+// uses the -a flag (we don't have to use "git add ." again) !remember: does not add newly created files!
+$ git commit -a -m
+
+// merge results of a branch back into the master branch
+$ git checkout master
+$ git merge name-of-branch
+
+// delete branch (usually not done, keep branches for fuller history and continual updates to branch)
+// **common to keep working on branch and merging back to master branch when desired
+$ git branch -d name-of-branch
+
+// delete branch even if we haven't merged the changes -- for major screwups
+$ git branch -D name-of-branch
+
+// make another push to server
+$ git push
+
+
+
+
+::: Check out remote branch
+// You could checkout directly the remote branch after fetching it
+$ git fetch origin
+$ git branch -f remote_branch_name origin/remote_branch_name
+$ git checkout remote_branch_name
+// or shorter:
+$ git checkout -b production origin/production
+//   You would be directly working from the fetched copy of origin/production branch (no conflict there).
+
+// !!DANGER!! By doing: 
+$ git co -b production
+$ git pull origin production
+//   You are trying to merge the remote production branch into your master (in a local 'production' branch, which means potentially conflicts if your master has locally a different history than the remote origin/production branch.
+
+
+
+
+
+::: git config file
+// list configurations
+$ git config -l
+
+-- place in ~/.gitconfig:
+[alias]
+  co = checkout
+  com = checkout master
+  cm = commit
+  cmm = commit -m
+  cma = commit -a
+  cmam = commit -a -m
+  rao = remote add origin
+  puom = push -u origin master
+[core]
+  editor = vim

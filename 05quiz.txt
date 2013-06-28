@@ -1,0 +1,65 @@
+## 1) What does MVCr stand for?
+
+
+___Model-View-Controller-routes
+
+
+
+## 2) In what file do we store 'r' from MVCr ?
+
+
+___config/routes.rb
+
+
+
+## 3) What two components make up a route
+
+___HTTP Verb
+___URL
+
+
+
+## 4) Why are Rails routes REST(ful) ?
+
+___The state (HTTP verb) of the request determines what the server action will be. The same URL with a different verb has a different outcome
+
+
+
+
+## 5) Match the data operations to the HTTP Verbs
+[GET, POST, DELETE, PUT]
+
+1) Create   ___POST
+2) Read     ___GET
+3) Update   ___PUT
+4) Destroy  ___DELETE
+
+
+
+
+
+## 6) Fill out the values below based on this log entry:
+
+    Started GET "/products/new" for 127.0.0.1 at 2012-06-28 11:33:36 -0700
+    Processing by ProductsController#new as HTML
+      Rendered products/new.html.erb within layouts/application (0.4ms)
+    Completed 200 OK in 11ms (Views: 9.3ms | ActiveRecord: 0.0ms)
+
+
+Was the request successful, why or why not? ___YES, the server sent the 200 response.
+What view file was rendered? ___products/new.html.erb
+What path was this request to ? ___/products/new
+What Controller was used ? ___products
+
+
+
+
+
+## 7) Build a route based on the log entry in the last exercise that maps from the correct url and verb to the correct controller and view.
+
+get "/products/new" => "products#new"
+
+
+
+
+

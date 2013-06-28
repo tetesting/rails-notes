@@ -1,0 +1,79 @@
+## Week 3 Quiz
+
+
+## 1) What does ERB stand for?
+
+___Embedded Ruby
+
+## 2) What is the name of the place (library) where additional built in Ruby functions can be accessed?
+
+___STDLib
+
+
+
+
+
+## 3) Name 3 Reasons to use Version Control.
+
+___To keep track of all of your changes
+___To make it easier to collaborate with others
+___To revert changes
+
+## 4) Name one version control software.
+
+___Git, Mercurial, SVN, CVS
+
+
+
+
+## 5) What is the output of this Ruby code?
+
+__I enjoy reading Harry Potter\nI enjoy reading Hunger Games\nI enjoy reading Cat in the Hat\n
+
+arry = ['Harry Potter', 'Hunger Games', 'Cat in the Hat']
+
+arry.each do |x|
+  puts "I enjoy reading #{x}"
+end
+
+
+## 6) What is the output of this ruby code?
+
+richard = User.create(:name => 'richard', :movie => 'zoolander')
+chris   = User.create(:name => 'chris',    :movie => 'sandlot')
+ruby    = User.create(:name => 'ruby',    :movie => 'princess bride')
+
+user_array = [richard, ruby, chris]
+
+user_array.each do |user|
+  puts "#{user.name} loves watching #{user.movie}"
+end
+
+___richard loves watching zoolander\nruby loves watching princess bride\nchris loves watching sandlot\n
+
+### Hint
+puts chris.name
+# => 'chris'
+
+puts chris.movie
+# => 'sandlot'
+
+
+
+## 7) Once we've modified and saved a file that is under version control what 3 steps do we need to get our changes on to our origin server?
+
+
+___git add filename
+___git commit -m "message"
+___git push origin master
+
+
+## 8) In the exercise we did for homework last week, you entered in a url similar to `http://localhost:8000/index` into your browser. Once the server got the request, explain what needed to happen in order for you to view the web page.
+
+Using the page generator code, the server looks at the views folder for the view corresponding to the route, processes the code based on user input, generating and sending back the view to the user
+
+-The server receives the request, and reads in the url
+-Looks for the view file corresponding to the path of the url
+-the server reads that view file and evaluates it to become html
+-sends that html back to the client/browser that made the request
+-the browser renders the html

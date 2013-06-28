@@ -1,0 +1,360 @@
+Databases and Rails
+
+Week 02 - Table Relationships and ActiveRecord
+
+
+Lec 01 - Table Relationships
+
+Ex. John has a relationship to his cars
+-> John has many cars
+-> a car belongs to John
+
+  In the database:
+  How to keep track?
+  Records: User #1, Car #1, Car #2
+  User #1:
+    Do not store the information with User!
+      Because if user has many cars, the record for user will have to be huge
+      Instead, store the user id in the records of the car table
+  Car #1 -> has one owner
+  Car #2 -> has one owner
+
+-- create cars table, which has a relation to the users table
+CREATE TABLE cars (
+ id serial PRIMARY KEY,
+ cartype varchar(255),
+ -- foreign key user_id points to users.id ... this is how the tables are related to each other!!
+ user_id int REFERENCES users(id),
+ description varchar(255)
+);
+
+-- Finding John's cars (2 steps)
+  -- 1 Find John's id (the linking column between users and cars)
+  SELECT * FROM users where user_name = 'john';
+  
+  -- 2 Find the cars that user with user_id=1 (john) owns
+  SELECT * FROM cars WHERE user_id = 1;
+
+-- Find John's cars without knowing his user ID (do it in 1 query)
+  -- We join the tables!
+SELECT users.* 
+  FROM users 
+  JOIN cars
+    ON cars.user_id = users.id
+ WHERE name = 'john';
+
+-- subqueries/subselects are slow
+-- indexes on foreign keys will increase performance
+
+-- select users who have a jeep
+SELECT users.*
+  FROM users
+  JOIN cars
+    ON cars.user_id = users.id
+ WHERE cartype = 'jeep';
+
+-- ----
+-- :: aggregate functions
+-- count all of a users cars
+SELECT COUNT(cars.*)
+  FROM cars
+  JOIN users
+    ON users.id = cars.user_id
+ WHERE name = 'john';
+
+-- other functions: AVG(), MIN(), MAX()
+
+-- comparison operators: =, <, >, <=, >=
+
+-- NULL
+-- comparing to null:
+SELECT *
+  FROM cars
+ WHERE user_id IS NULL;
+SELECT *
+  FROM cars
+ WHERE user_id IS NOT NULL;
+
+--
+--
+-- MANY TO MANY relationships (aka habtm: has and belongs to many)
+
+-- a car may have many users
+-- CANNOT store all of the users in a car table. (what if the car has A LOT of users?)
+
+-- so we store the relationships in a separate table:
+-- cars_users join table
+CREATE TABLE cars_users (
+ car_id int REFERENCES cars(id),
+ user_id int REFERENCES users(id),
+ PRIMARY KEY(car_id, user_id)
+);
+
+-- remove column with ALTER TABLE
+ALTER TABLE cars DROP COLUMN user_id;
+
+-- find users who own car 1
+SELECT name
+  FROM users
+  JOIN cars_users
+    ON users.id = cars_users.user_id
+ WHERE car_id = 1;
+
+-- find all cars that user 1 owns
+SELECT car_id
+  FROM cars
+  JOIN cars_users
+    ON cars.id = cars_users.car_id
+ WHERE user_id = 1;
+
+-- habtm is not used as much... we used it as a simple introduction to the many-to-many relationship
+-- has many through table is what is used
+
+
+
+
+Lec 02 - ActiveRecord
+
+::: Databases in RUBY!
+
+:: Rails uses ActiveRecord
+ActiveRecord is an ORM (Object Relational Mapper)
+  -maps relationships from our database onto Ruby objects
+
+ActiveRecord, like Rails, Follows convention over configuration
+
+# tell a class that it is an ActiveRecord class
+class User < ActiveRecord::Base
+end
+
+# we can use ActiveRecord to create and insert data into the database
+User.create(:name => 'john', 
+            :movie => 'up')
+
+# querying for the first user with name 'john'
+john = User.where(:name => "john").first
+
+puts john.name
+puts john.movie
+
+# look at the SQL that the ActiveRecord code runs
+User.where(:name => "john").to_sql
+Users.where("movie is not null").to_sql
+
+## Using the ORM saves time over doing things in pure SQL
+## Anything done in regular SQL can be done in ActiveRecord
+## ActiveRecord can be thought of as a loose wrapper for the SQL database
+
+### Rails demo:
+rails _3.2.13_ new w2demo
+cd w2demo
+# generate scaffold for user model, with fields name and movie (of the default type string)
+rails g scaffold user name movie fave_num:integer
+
+## the User model:
+# in app/models/user.rb:
+class User < ActiveRecord::Base # User is a subclass of the ActiveRecord::Base class
+  # attr_accessible controls the attributes accessible through mass assignment
+  attr_accessible :movie, :name
+end
+
+## the schema for the Users table: 
+# in db/migrate/YYYYMMDDHHMMSS_create_users.rb:
+class CreateUsers < ActiveRecord::Migration
+  def change
+    create_table :users do |t|
+      t.string :name
+      t.string :movie
+      t.integer :fave_num
+
+      t.timestamps
+    end
+  end
+end
+
+# transfer the changes to the database system:
+rake db:migrate
+
+# rails console
+rails c
+User.create(:name => 'john', :movie => 'up')
+# Get last record in User table
+User.last
+# Get the value for the field 'name' of the first record in User table
+User.first.name
+# Assign the contents of the record to a variable
+usr = User.first
+usr.name
+# search for a user
+User.where(:name => 'john')
+# view the equivalent SQL statement
+puts User.where(:name => 'john').to_sql
+
+
+Recap:
+created project
+changed into proj directory
+created users model
+looked at the migration
+modify config/database.yml and created the database
+migrated the database
+rails console
+insert user
+simple queries
+
+Now...
+
+:: One has many relationship
+
+## Generate the Car table, which has a foreign key to the User table
+rails g scaffold car user:belongs_to condition year:integer
+
+# in app/model/car.rb:
+class Car < ActiveRecord::Base
+  belongs_to :user
+  attr_accessible :condition, :year
+end
+
+# in db/migrate/YYYYMMDDHHMMSS_create_cars.rb:
+class CreateCars < ActiveRecord::Migration
+  def change
+    create_table :cars do |t|
+      t.belongs_to :user
+      t.string :condition
+      t.integer :year
+
+      t.timestamps
+    end
+    add_index :cars, :user_id
+  end
+end
+
+
+rake db:migrate
+
+rails c
+Car.create(year: 2003, condition: 'ok')
+Car.last
+Car.where(condition: 'ok').first.user_id   # nil: no user in a car yet
+User.last.cars  # ERROR: user does not know about cars yet
+^D
+
+# edit the User model so that it knows that is has cars
+Class User < ActiveRecord::Base
+  has_many :cars
+  attr_accessible :fave_num, :movie, :name
+end  
+
+rails c
+User.first.cars
+usr = User.first
+usr.cars.create(year: 2012, condition: 'awesome')
+usr.cars
+Car.where(id: 2).first.user
+
+
+
+Recap 2:
+generated car
+viewed cars
+migrated database
+added has_many to user
+Result: User has_many cars; Car belongs_to user
+
+:: joins
+
+User.where(name: 'tam').joins(:cars).to_sql
+ => SELECT "users".* FROM "users" INNER JOIN "cars" ON "cars"."user_id" = "users"."id" WHERE "users"."name" = 'tam'
+
+# find all users with awesome cars
+User.joins(:cars).where(cars: {condition: awesome})
+ == SELECT "users".* FROM "users" INNER JOIN "cars" ON "cars"."user_id" = "users"."id" WHERE "cars"."condition" = 'awesome'
+
+# find count of users with awesome cars
+User.joins(:cars).where(cars: {condition: 'awesome'}).count
+
+
+
+### "has_and_belongs_to_many" vs "has_many :through"
+
+# both use an intermediary table, but only "has_many :through" uses an intermediary MODEL
+
+# has_and_belongs_to_many -- the intermediary is a table only has two fields for the two foreign keys and represents the direct relationship. Contains no other fields.
+  ex. 
+    class Assembly < ActiveRecord::Base
+      has_and_belongs_to_many :parts
+    end
+    class Part < ActiveRecord::Base
+      has_and_belongs_to_many :assemblies
+    end
+
+  VS
+  
+    class Assembly < ActiveRecord::Base
+      has_many :manifests
+      has_many :parts, :through => :manifests
+    end
+    class Manifest < ActiveRecord::Base
+      belongs_to :assembly
+      belongs_to :part
+    end
+    class Part < ActiveRecord::Base
+      has_many :manifests
+      has_many :assemblies, :through => :manifests
+    end
+  # use the second option if you want the relationship model as an independent entity
+  
+# has_many :through 
+  -- the intermediary is its own model and has other useful fields
+    ex. 
+      class Doctor < ActiveRecord::Base
+        has_many :appointments
+        has_many :patients, :through => :appointments
+      end
+      class Patient < ActiveRecord::Base
+        has_many :appointments
+        has_many :doctors, :through => :appointments
+      end
+      class Appointment < ActiveRecord::Base
+        belongs_to :doctor
+        belongs_to :patient
+      end
+  -- can be used as a shortcut to retrieve data through nested has_many associations
+    ex. Document has_many :sections, and 
+        Section has_many :paragraphs, so 
+        Document has_many :paragraphs, :through => :sections
+        
+      class Supplier < ActiveRecord::Base
+        has_one :account
+        has_one :account_history, :through => :account
+      end
+      class Account < ActiveRecord::Base
+        belongs_to :supplier
+       has_one :account_history
+      end
+      class AccountHistory < ActiveRecord::Base
+        belongs_to :account
+      end
+
+
+## self joins
+ex.
+  class Employee < ActiveRecord::Base
+    has_many :subordinates, :class_name => "Employee",
+      :foreign_key => "manager_id"
+    belongs_to :manager, :class_name => "Employee"
+  end
+
+## polymorphic associations
+ex.
+class Picture < ActiveRecord::Base
+  belongs_to :imageable, :polymorphic => true
+end
+ 
+class Employee < ActiveRecord::Base
+  has_many :pictures, :as => :imageable
+end
+ 
+class Product < ActiveRecord::Base
+  has_many :pictures, :as => :imageable
+end

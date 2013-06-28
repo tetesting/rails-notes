@@ -1,0 +1,188 @@
+Databases and Rails
+
+Week 04 - Routes
+
+
+Recap Of what's happened thus far:
+
+Database Backed Models - A ruby class that enables us to persist data to a database
+Created databases in Rails
+Added some data
+Queries
+Joins
+
+Ruby built views
+HTML and ERB
+Views are HTML and CSS + JavaScript
+ERB Tags:
+  <% "some code goes here" %>
+  <%= "an expression goes here to be printed onto the HTML" %>
+
+Arrays.each
+Arrays.map
+
+Git - keep your files backed up and allow for rolling back in time
+  -tracking changes, easily see diffs between commits
+  -distributed work flow between team members
+-------
+
+
+:::: Lec 01 - Routes and URLs
+
+Rails is a MVCr Framework
+MVC - Model-View-Controller
+r - Routes
+
+Models: A way to map Ruby classes to persisting data in the database
+  - We use ActiveRecord
+Views: Dynamically generating HTML output based on user input
+
+How do we wire these 2 things to the web?
+with Routes!
+
+Routes are mapped based on URL structure and HTTP verb
+
+::: URLs (Uniform Resource Locator)
+:: URL anatomy:
+  Protocol: http://
+ Subdomain: www.
+    Domain: github.com
+      Path: /user
+
+URLs can use different protocols: HTTP, HTTPS, 
+
+The subdomain www can be omitted in many cases
+There can be different subdomains as well, eg. http://api.github.com
+
+The path can be just / or nothing, to show the home page
+There can be multiple paths: http://www.github.com/user/project1
+
+:: Query String (params)
+  - a way to transmit addtional data in addition to the url
+
+ex. calculatethis.com/add?x=4&y=5
+
+Query anatomy: ?parameter=value
+The ? defines a query
+the stuff after it defines the query string
+Use the '&' to chain multiple parameters in the string
+
+
+
+:::: Lec 02 - HTTP (Hypter Text Transfer Protocol) Verbs
+
+::: HTTP Verbs
+The types of transactions that can be carried out in a HT Transfer
+
+:: GET - asks for the page/data from the server
+- does NOT modify data on the server
+
+ex. viewing a wikipedia page, clicking on a link
+
+:: POST - sends data to the server and thus changing the state of the server
+- it DOES change the state of the server 
+    -(not necessarily any persisting data in the database)
+
+ex. posting a facebook comment, sign up for a user account
+    
+    sign in to a website: does not change anything on a database, but changes the state of the server to let it know that we are signed in. 
+      -however, many sites will keep track of when you last logged on, like banking sites
+
+-Posts are usually initiated by a web form
+Exceptions:
+  -Google's search bar on its site...
+    Search is based on a form, but does not change the state of the server (usually)
+
+REMEMBER: GET - request to retrieve data   ,   POST - request to add data
+
+
+
+:::: Lec 03 - REST: Routes = URL + HTTP Verb
+
+REST (REpresentational State Transfer): The same URL can do different things based on the HTTP verb
+  Another way to think about it: The state of the data changes the data itself
+
+Saying the same thing with a different state changes its meaning
+
+State:
+  ex. saying the same message in a welcoming or frustrated tone -- a different overall message is being conveyed
+
+URL => message
+HTTP Verb => state
+
+
+ex. GET: /products    =>   List all products on a website 
+    POST: /products   =>   Create a new product on a website  
+
+::: CRUD
+POST    =>  Create
+GET     =>  Read
+PUT     =>  Update
+DELETE  =>  Destroy
+
+!! Rails Routes are RESTful
+
+
+
+:::: Lec 04 - Controllers
+- one major function: controllers specify what views we see
+
+- Routes map URLs to Controllers
+  - Route = HTTP Method + URL
+
+ex.
+
+  HTTP Method  |  URL  |  'maps to'  | Controller # Action
+  
+  get         '/products'     =>        'Products#index'
+
+:: Action:
+generally, the action maps to the view
+ex. index => index.html.erb
+
+:: Controller: 
+tells us where the view lives
+maps to the folder containing the views
+ex. app/views/products/
+
+Remember: ROUTE maps to CONTROLLER and its ACTION
+ex. get '/productss' => app/views/products/index.html.erb
+----
+:::: EXERCISE
+
+rails console:
+User.all
+User.first
+User.where(name: 'Tam')
+tam = User.where(name: 'Tam').first
+tam.job_title
+
+Product
+tam.products
+tam.products.create(name: 'rails book', price: 19)
+Product.where(name: 'rails book').first
+Product.where('price > 5')
+
+cheap_book = Product.where("price > 5").first
+cheap_book.user
+
+
+HTTP Responses:
+200 - Good
+404 or 500 - not good
+301 or 302 - redirect
+
+all_products = Product.all
+## produce a list of all user primary keys for future reference
+all_products = Product.includes(:user).all
+
+
+## check the routes of the rails project at the shell prompt:
+rake routes
+
+params.inspect
+
+
+
+
+

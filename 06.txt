@@ -1,0 +1,313 @@
+Databases and Rails
+
+Week 06 - Data Vidualization with JavaScript
+
+
+Recap Of what's happened thus far:
+1 Database Backed Models
+2 Ruby built views
+3 Route = HTTP Verb + URL
+   GET: for retrieving data
+   POST: for sending data
+4 Controller - what redirects and moves the user around the website
+  - renders, redirects, filters, formats
+  rake routes 
+
+-------
+
+----
+:::: Lec 01 - Instance and Class Methods
+
+::: Class
+class User
+end
+
+::: Instance
+john = User.new
+puts john.is_a? User 
+  # => true
+
+::: Instance Methods
+class User
+  def favorite_thing
+    puts "Ruby!!!"
+  end
+end
+
+john = User.new
+puts john.favorite_thing
+# or
+puts User.new.favorite_thing
+
+# !! not a class method!
+
+::: self
+- used within the class definition
+- how an instance references itself
+class User
+  def whoami
+    self
+  end
+end
+
+john = User.new
+puts john.whoami
+# => #<User:0x23e22432>
+puts john.whoami == john
+
+::: Class Methods
+- used for special methods may not be done on an instance-by instance basis
+  ex. counting all existing instances, looking for instances that follow some requirement
+- self can also be used to define class methods
+class User
+  def self.favorite_thing
+    puts "Ruby!!!"
+  end
+end
+
+puts User.favorite_thing
+
+# !! class methods cannot be used on instances!
+# you can have both class methods and instance methods of the same name
+
+::: examples
+ex. class method...
+  john = User.where(:name => "john").first
+
+ex. instance method...
+  john.name
+
+
+----
+:::: Lec 02 - JavaScript and jQuery
+- Ruby is a server-side language (among others)
+- JavaScript is the only language that can be used as the client side language in browsers
+
+What can JavaScript do?
+-send to and retrieve data from a server asynchronously
+  - aka the page can interact with the server without a full page reload
+  - with AJAX
+-change the web page after it has loaded
+  - interacting with the dom
+
+How to use JavaScript? 3 ways:
+1 In-line...
+  <p onclick="alert('hello world')">click me</p>
+  // the "worst" way to use JavaScript
+
+2 Embedded...
+  <script type="text/javascript">
+    alert('hello world'); // pop up when browser loads this code
+  </script>
+  // place the javascript code in <script> tags in the HMTL document
+
+3 Linked...
+  <script src="scripts.js"></script>
+  // have all of the javascript code be in a separate js file.
+
+::: DOM (Document Object Model)
+- how computers/browsers see nested HTML
+
+Each document is organized in a tree-like structure
+There is one and only one root: the HTML element
+<body> is a child of <html>
+<body> can have the children <p>, <ul>, <br/>, etc...
+<ul> can have many <li> as children
+the text contained in <li> would be called a "text node"
+all of the <li>'s directly under the same <ul> are siblings, because they have the same parent, <ul> -- note that they are at the same depth AND they have the same parent
+elements that are at the same depth but do not have the same parent ARE NOT siblings
+
+::: jQuery
+Although you can manipulate the DOM with plain JavaScript, it is simply a pain...
+... so that is why jQuery was created! 
+- makes it MUCH easier to deal with the DOM
+- uses the same language across different browsers (each of which may do things a bit differently than the next)
+- a JavaScript library (written completely in JavaScript)
+- you load it into the browser before you start "coding in jQuery"
+- many CDNs host jQuery, so you can just link to them (using <script src...)
+
+// diving in...
+
+// the jQuery selector
+$()
+
+// select the body tag with jQuery
+$("body")
+
+  // note that a parent brings with it all of its children
+
+$("body").hide()
+$("body").show()
+
+// note that everything that happens in your browser with DOM manipulation is only seen by your browser (we're doing local session changes only)
+
+:: jQuery's CSS-like selectors
+
+$('div') // selects all div tags
+$('span') // selects all span tags
+$('#primary') // selects the first element with id "primary"
+$('.error') // selects all elements with class "error"
+$('p.error') // selects all <p> elements with class "error"
+
+
+::: How does Ruby talk to JavaScript?
+ex.
+- in index.html.erb...
+  <script type="text/javascript">
+    alert('<%= "hello world" %>');
+  </script>
+
+- evaluates to...  
+  <script type="text/javascript">
+    alert('hello world');
+  </script>
+
+
+----
+:::: Lec 03 - Rails's Asset pipeline
+
+Rail's Assets consists of:
+1 CSS files
+2 JavaScript files
+3 Images
+
+They are stored in app/assets
+app/assets
+
+In production, the finished public files are in
+public/assets
+
+The assets folders:
+assets/stylesheets
+assets/javascripts
+assets/images
+
+- We don't put them in the public folder directly in case we have private things in the asset files, or if we are going to process them in some way with rails.
+
+::: Benefits of the app/assets folder:
+minify, compile, fingerprint
+
+:: Minify
+- minimizes the size of the final production files
+- remove whitespace, comments, change variable names 
+
+:: Compile
+
+- we can use CSS Preprocessors like SASS or SCSS
+- these preprocessors have cool features like variable and function support
+- store those files in app/assets/stylesheets...
+... and then compile them into CSS
+
+ex.
+  SCSS:
+    $blue: #3bbfce;
+
+    .content-navigation {
+      border-color: $blue;
+      color: darken($blue, 9%);
+    }
+
+ or...
+  SASS:
+    $blue: #3bbfce
+
+    .content-navigation
+      border-color: $blue
+      color: darken($blue, 9%)
+
+ turns into...
+  CSS:
+    .content-navigation {
+      border-color: #3bbfce;
+      color: #2b9eab;
+    }
+
+- we can also compile CoffeeScript into JavaScript!
+hilarious example:
+  
+  foods = ['broccoli', 'spinach', 'chocolate']
+  eat food for food in foods when food isnt 'chocolate'
+
+... turns into:
+
+(function() {
+  var food, foods, _i, _len;
+
+  foods = ['broccoli', 'spinach', 'chocolate'];
+
+  for (_i = 0, _len = foods.length; _i < _len; _i++) {
+    food = foods[_i];
+    if (food !== 'chocolate') {
+      eat(food);
+    }
+  }
+}).call(this);
+
+
+:: Fingerprint/hashing
+- Fingerprinting === Hashing
+!! not to be confused with the dictionary hash
+
+- A hash will only be identical to another if the files hashed are identical
+
+We hash these files and append it to the file name.
+-if we change the contents of the css file, the filename will also change
+
+Why? 
+  - To invalidate browser cache
+  - the browser caches files from the server so that it will not have to redownload the same file over and over, saving bandwidth and improving performance by reading local disk
+  - however, if the file's content changes and its file name remains the same, the client may not download the updated file (browser may want to hold on to it for too long)
+  - but if we change the filename (like through hashing) on the server, the client will  download that file, guaranteeing that it uses the files you want
+
+_ the automated fingerprinting done by rails is very useful!
+
+::: Environments: Development vs Production
+
+:: Develop
+  - compile on every request
+  - minify is off
+  - fingerprint is off
+
+:: Production
+  - compile once at deploy
+  - minify is on
+  - fingerprint is on
+
+
+----
+:::: Lec 04 - Project tips
+
+Project Requirements:
+- A model capable of CRUD on the web
+- User signup/login  -hint: devise
+- Graph or Chart
+- Custom Layout & Stylesheet
+- Use pagination  -hint: will paginate
+- AJAX
+
+Ideas:
+blog, shopping cart, social news site
+
+-create a site proposal and site sketch
+
+site proposal: 
+  - rough outline
+  - user stories (what a user's visit to your site would consist of)
+
+site sketch:
+  - mockups
+
+----- EXERCISE
+
+
+
+
+
+
+
+
+
+
+
+
+

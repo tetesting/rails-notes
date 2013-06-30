@@ -1,0 +1,125 @@
+## 1) Instance or class method?
+
+A)  User.where(:name => 'rich')
+
+Class Method
+
+
+
+
+B) @user.favorite_movie
+
+Instance Method
+
+
+C) [1,2,3,4].map {|x| x + 1 }
+
+Instance Method
+
+D) Hash.new
+
+Class Method
+
+E) "richard".upcase
+
+Instance Method
+
+
+
+
+
+## 2) Which is an instance method and which is a class method?
+
+
+class Product
+
+  def self.highest_rated
+    # ...
+  end
+
+
+  def rating 
+    # ...
+  end
+end
+
+
+highest_rated is a Class Method
+
+rating is an Instance Method
+
+
+
+## 3) Here is an example HTML and some jQuery selectors, give me the contents of the HTML for the jQuery selector.
+
+
+    <p>
+      Hello there
+    </p>
+    <ul>
+      <li id='thebest'>Ruby</li>
+      <li class='thebest'>javascript</li>
+      <li class='thebest maybe'>python</li>
+    </ul>
+
+
+Example:
+
+
+$('p')
+
+Returns HTML with the contents
+
+"Hello there"
+
+
+
+
+A) $('#thebest')
+
+
+"Ruby"
+
+
+
+B) $('.maybe')
+
+
+"python"
+
+
+C) $('.thebest')
+
+["javascript", "python"]
+
+
+## 3) In the example above how would you describe the relationship between `ul` & `li`? What about between `p` & `ul`?
+
+UL is a parent of LI
+LI is a child of UL
+
+P and UL are siblings
+
+
+
+
+## 4) What folder do you put assets go in a Rails project?
+
+
+app/assets folder
+
+
+
+## 5) Describe what a callback function is, explain why you would want to use one? What is the alternative to a callback function?
+
+
+Callback functions are used in code when we don't want to wait for an event or we don't want to use polling to constantly check to see if an event has happened. We use callbacks so we can effectively use our code's time, and we don't have to block on waiting for events. 
+
+One alternative to a callback function is polling ("are we there yet?").
+
+
+
+
+
+
+## 6) Give me one example of a DOM event. 

@@ -213,6 +213,31 @@ Path helper uses the relative path
 
 
 
+----- EXERCISE
+Form Helpers
+Model errors
+
+Partials
+A partial is a reusable view piece that can be used by multiple different views.
+Begin with an underscore _. 
+
+route resources
+
+show
+edit
+update
+
+redirect_to @model_object
+
+flash - for passing on one-time messages
+  flash[:notice] can be used with redirects
+  good for lightweight apps
+  should not be relied on too much
+
+destroy
+
+
+
 
 
 

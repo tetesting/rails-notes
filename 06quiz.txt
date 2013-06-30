@@ -1,0 +1,80 @@
+## Week 5 Quiz
+
+## 0) Name 3 types of variables in Ruby? Put them in order from least scope to greatest.
+___ local, instance, constant
+
+## 1) Where do SQL queries belong, the view or controller?
+
+___ controller
+
+
+
+
+## 2) Controllers are can do 4 types of operations what are they (RRFF)?
+
+___ render, redirect, filter, format
+
+
+
+
+
+
+## 3) List the routes it usually take to fully implement CRUD in a web app:
+
+___ Create: new, create
+___ Read: index, show
+___ Update: edit, update
+___ Destroy: destroy
+
+## 4) What view typically holds a form that submits to the `create` action?
+
+___ new.html.erb
+
+
+
+
+## 5) What view typically holds a form that submits to the `update` action?
+
+___ edit.html.erb
+
+
+
+
+## 6) If you forget what routes are available, what command can you run from the command line to help remember?
+
+
+$ ____________ rake routes
+
+
+
+## 7) Below is part of a route.rb file that would be mapped to the appropriate controller, replace this with one line of code.
+
+
+
+    get '/comments'
+    get '/comments/new'
+    get '/comments/:id/edit'
+    get '/comments/:id'
+
+    post   '/comments'
+    delete '/comments/:id’
+    put    '/comments/:id'
+
+___ resources :comments
+
+
+## 8) Below is the code for a controller and a view, what controller action will be hit when you click on a link labeled "click me"?
+
+app/controllers/courses_controller.rb
+
+    def index
+      @courses = Course.all
+    end
+
+app/views/courses/index.html.erb
+    <h2>Courses</h2>
+    @courses.each do |course|
+      <%= link_to "click me", course %>
+    end
+
+___ show.html.erb

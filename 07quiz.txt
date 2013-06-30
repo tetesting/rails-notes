@@ -1,0 +1,114 @@
+
+## 1) Instance or class method?
+
+A)  User.where(:name => 'rich')
+
+
+
+
+
+
+B) @user.favorite_movie
+
+
+
+
+C) [1,2,3,4].map {|x| x + 1 }
+
+
+
+D) Hash.new
+
+
+
+E) "richard".upcase
+
+
+
+
+
+
+
+## 2) Which is an instance method and which is a class method?
+
+
+class Product
+
+  def self.highest_rated
+    # ...
+  end
+
+
+  def rating 
+    # ...
+  end
+end
+
+
+
+
+
+
+## 3) Here is an example HTML and some jQuery selectors, give me the contents of the HTML for the jQuery selector.
+
+
+    <p>
+      Hello there
+    </p>
+    <ul>
+      <li id='thebest'>Ruby</li>
+      <li class='thebest'>javascript</li>
+      <li class='thebest maybe'>python</li>
+    </ul>
+
+
+Example:
+
+
+$('p')
+
+Returns HTML with the contents
+
+"Hello there"
+
+
+
+
+A) $('#thebest')
+
+
+B) $('.maybe')
+
+
+C) $('.thebest')
+
+
+
+
+## 3) In the example above how would you describe the relationship between `ul` & `li`? What about between `p` & `ul`?
+
+
+
+
+
+
+## 4) What folder do you put assets go in a Rails project?
+
+
+
+
+
+
+## 5) Describe what a callback function is, explain why you would want to use one? What is the alternative to a callback function?
+
+
+
+
+
+
+
+
+
+## 6) Give me one example of a DOM event. 
+
+

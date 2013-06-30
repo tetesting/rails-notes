@@ -1,0 +1,99 @@
+## 1) What is SQL Injection
+
+SQL Injection is a security vulnerability where an attacker can run arbitrary SQL code on your machine because we are not using safe Active Record practices. 
+
+
+## 2) Which of these are safe from SQL Injection attacks?
+
+A)
+
+    User.where(:name => params[:name])
+
+This is safe, we are using the hash syntax.
+
+B)
+
+    Product.where("price > (?)", params[:price])
+
+This is safe, we are using the ? syntax
+
+C)
+
+    Product.where("price < 5")
+
+This is safe, since there is no user input at all, no one could possibly inject SQL. I would still not put this in my app since someone wanting to modify this statement could too easily forget about SQL injection and add a string escape #{} to our sql.
+D)
+
+    name = params[:name]
+    query = "name = " + name
+    User.where(query)
+
+This is not safe, we are building our own sql string, where a malicious user could run their own SQL. Active Record can only protect us if we stick to its conventions.
+
+E)
+
+  Product.where("quality = #{params[:quality]}")
+
+This is not safe, we are building our own sql string, where a malicious user could run their own SQL. Active Record can only protect us if we stick to its conventions.
+
+
+## 3) Below is the help for Enumerable#detect what are some possible returns from the method?
+
+detect(ifnone = nil) {| obj | block } → obj or nil click to toggle source
+find(ifnone = nil) {| obj | block } → obj or nil
+detect(ifnone = nil) → an_enumerator
+find(ifnone = nil) → an_enumerator
+
+Passes each entry in enum to block. Returns the first for which block is not false. If no object matches, calls ifnone and returns its result when it is specified, or returns nil otherwise.
+
+If no block is given, an enumerator is returned instead.
+
+Answer: We can expect an object (obj) or nil or an_enumerator. Enumerators are constructs that allow us to loop through it's contents.
+
+## 4) Which of the methods below can we use to query against an aggregate set of data. For instance a store has many products and each product belongs to the store. What methods would we need to use to find all of the stores that that have an average product price of greater than $10?
+
+    find
+    where
+    includes
+    order
+    limit
+    offset
+    joins
+    group
+    having
+
+
+Answer: To find all stores that have an average product price greater than 10 we would have to group by store_id and the use "AVG(products.price) > 10" inside of a having clause.
+
+the two methods we use are `group` and `having`
+
+## 5) Explain the difference between inner join and outer join
+
+Answer:
+Inner join must have 3 criteria met. We must have a primary key, a foreign key, and they must match. 
+
+An outer join has no such criteria, we can pull back data even if a record does not have an object with a matching foreign key. 
+
+## 6) What method can we use to get rid of the N+1 Query problem?
+
+
+Answer: includes
+
+## 7) Which of these indicates a Class method and which an instance method?
+
+
+A)
+    @user.name
+
+Answer: instance method
+
+B)
+
+    User.last
+
+
+Answer: Class method
+
+## 8) What type of logic did we use in our testing last week?
+
+Answer: We used `assertion` logic in our tests last week. 

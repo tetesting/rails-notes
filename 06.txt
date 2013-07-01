@@ -299,14 +299,79 @@ site sketch:
 
 ----- EXERCISE
 
+::: Navigating the DOM tree with jQuery:
+ 
+// get the first document object matching a selector
+$('.class').first()
+$('p').first()
+
+// find its immediate parent
+$('.class').first().parent()
+
+// the parent of the parent of its parent (returns a single object)
+$('.class').first().parent().parent().parent()
+
+// returns an array containing all of its ancestors, from the closest to farthest
+$('.class').first().parents()
+
+// returns an array containing all of its ancestors that match the selector
+$('.class').first().parents('.parentclass')
+$('.class').first().parents('table')
+
+::: Intro to JavaScript/jQuery
+
+// to ensure that the script loads only after the DOM tree has loaded...
+// use jQuery's ready() function:
+$(document).ready(function() {
+  // code goes here
+});
+
+:: Functions
+
+// Note that javascript functions follow this syntax:
+function funcName() {
+  console.log('this is fun');
+}
+funcName();
+
+// but it is better to use anonymous functions -- store them in a variable:
+fun = function(x){
+    console.log(x);
+  };
+fun('This shall be printed to the console');
+
+: Callbacks
+// functions can be passed around like objects/variables
+// for instance, the $(document).ready() function uses a function as an argument when it wants to
+// the behavior of $(document).ready() is referred to as "non-blocking", since the function being stored does not stop/block the execution of the program while waiting for the event.
+// in contrast, "polling" is when the execution of the program is paused while it is waiting for an event to occur
+
+: JavaScript Objects
+// are like Ruby's hashes
+foo = {
+      renderTo: 'highChartContainer',
+      plotBackgroundColor: null,
+      plotBorderWidth: null,
+      plotShadow: false
+    }
+// access the fields using . (dot)
+foo.renderTo
+foo.plotShadow
+
+// / naming convention in JavaScript is camelCase, not snake_case (Ruby/Python)
+
+: data- attributes
+// You can create attributes in HTML tags like so:
+<button data-hide-element='chart'>View/Hide Chart</button>
+// and then reference them with jQuery like so:
+$('[data-hide-element=chart]').on('click', function() {
+  $('#highChartContainer').toggle();
+})
 
 
-
-
-
-
-
-
+::: AJAX - Asynchronous requests
+// a way to manipulate the DOM by having the client talk to the server without needing a page reload!
+// Asynchronous in this regard means that we don't have to wait for the request to finish before we do other things
 
 
 

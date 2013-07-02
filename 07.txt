@@ -1,0 +1,255 @@
+Databases and Rails
+
+Week 07 - Active Record Deep Dive
+
+
+Recap Of what's happened thus far:
+1 Database Backed Models
+2 Ruby built views
+3 Route = HTTP Verb + URL
+   GET: for retrieving data
+   POST: for sending data
+4 Controller - what redirects and moves the user around the website
+  - renders, redirects, filters, formats
+  rake routes 
+5 With MVC done... we went on to:
+  - instance vs class methods
+  - JavaScript and jQuery
+  - DOM
+  - Rails Asset Pipeline (for stylesheets, javascripts, images)
+
+----
+
+____
+:::: Lecture 01 - ActiveRecord Query Interface
+
+::: WHERE
+
+User.where(id: 1)           # returns a list
+User.where(id: 1).first     # returns the first item in the list
+User.where("id = 1")        # using sql syntax
+
+Product.where("price < 5")  # all prices less than 5
+Product.where("price <> 5") # not equal to 5
+
+# using wild cards
+  # % - match any number of any characters
+  # _ - match exactly one character
+  
+  Product.where("name like '%Auto%'")
+
+# using placeholders with (?)
+  Product.where("price in (?)", [1,2,3,4,5])
+  Product.where("price not in (?)", [1,2,3,4,5])
+
+
+::: INCLUDES
+
+# VERY BAD THING:
+products = Product.limit(22)
+products.each do |p|
+  p.user
+end
+## It will do another SQL query for each record/iteration ... redundant and badly impacts performance!
+
+# You can include a subquery with include(), which retrieves all of the records that are foreign keys in the original table that is queried
+products = Product.includes(:user).limit(22)
+products.each do |p|
+  p.user
+end
+## this runs SELECT "products".* FROM "products" LIMIT 22
+## and then it does SELECT "users".* FROM "users" WHERE "users"."product_id" IN (1,2,...)
+## and stores it in memory for quick access
+
+
+::: FIND
+# allows you to find a record by id
+user = User.find(1)
+## Raises an error if the id does not exist
+
+
+::: ORDER
+# allows you to order your results by a field's value in either descending or ascending order
+# use 'ASC' for ascending and 'DESC' for descending
+
+Product.limit(5).order(:price) # in ascending order by default
+
+# get the record with the highest price
+  Product.order(:price).last.price          # method 1
+  Product.order('price desc').first.price   # method 2
+
+
+::: LIMIT
+# limits the number or records returned
+
+Product.limit(22)
+
+Product.first == Product.limit(1).last
+
+Product.first(10) == Product.limit(10)
+
+
+
+::: OFFSET
+# Recall...
+Product.order('price desc').limit(10) # get the top 10 priciest products in desc order
+
+Product.order('price').limit(10) == Product.order('price').offset(0).limit(10)
+
+# Retrieve the cheapest item
+Product.order('price').offset(0).limit(10).first == Product.order('price').limit(10).first
+
+# Retrieve the 10th cheapest item -- !! remember the 0-index base!
+Product.order('price').offset(9).first
+
+## Useful for paginating. -- use the paginate gem!
+
+
+::: JOINS
+
+# consider:
+class Product < ActiveRecord::Base
+  belongs_to :user
+end
+
+class User < ActiveRecord::Base
+  has_many :products
+end
+
+:: INNER JOIN  (exclusive joins)
+# finding all of a user's products...
+  prods = Product.joins(:user).where(users: {name: 'john'})
+  ## is equivalent to => User.where(name: 'john').first.products
+
+## !! performance tip: use joins instead of multiple queries whenever possible!
+
+# NOTE that rails returns only one half of the (newly joined) table
+# the table you start with determines what is returned 
+  # e.g. Product.joins returns products.*
+  #      User.joins returns users.* 
+
+# inner join is the default join in ActiveRecord as it is the most commonly used one
+# why is it called inner join? example:
+  # take all the 'users' with an 'id' and all the 'products' with the matching (foreign key) 'user_id' and join them together
+
+# what if we want to find a product with no users?
+  prods = Product.where(user_id: nil)
+  # easy enough. moving forward...
+# what if we want to find a user with no products?
+  # not possible with inner joins!
+  # inner join CANNOT join a table with another to find non-existent relationships
+    # in comes the outer join!
+
+# Since User-Product is a 1-n relationship,
+# User.joins(:products).count == Product.count - the number of products without users
+
+:: OUTER JOIN  (inclusive joins)
+# can join two tables, including all the records from one table even if it does not have any matches records in the other table
+
+# ex. take all the users and match them up with a product even if no matching product exists
+  User.joins("LEFT OUTER JOIN products ON users.id = products.user_id")
+  # for the users with no products, the SQL DBMS inserts dummy null values as data for their sole (dummy null) product
+
+
+# find all the users with no products...
+  User.joins("LEFT OUTER JOIN products ON users.id = products.user_id").where(products: {id: nil})
+
+
+
+::: GROUP
+# we can group things based on a column, returning a hash mapping the groups to their count (frequency)
+
+# ex. group the prices of the products
+prods = Product.group(:price).count
+# => returns a hash: { price => count }
+
+# NOTE that although we used 'count' with group, we get a hash, not an integer!
+
+# To get the integer count of all the groups, do:
+Product.group(:price).all.count
+  # or Product.group(:price).count.length
+
+::: HAVING
+# Is like WHERE, but looking at groups/functions instead of stored values
+# MUST be paired with a group function
+
+# ex. find all product prices that occur more than 3 times
+prods = Product.group(:price).having('count(price) > 3')
+
+  # the number of product prices that occur more than 3 times
+  prods.all.count
+
+  # the hash grouping of the product prices and their frequencies
+  prods.count
+
+
+## GROUP and HAVING are very useful for analytics
+# ex scenario: Users taking courses...
+          # how many users take more than 5 courses?
+
+::: DISTINCT
+# returns a count of the distinct record/field values
+
+prods.count('DISTINCT(name)')
+prods.count(:name, distinct: true)
+
+
+::: SELECT
+# used to select certain fields from the table
+
+User.select("name")
+User.joins(:products)
+
+# return an array of distinct Model objects:
+User.joins(:products).select("distinct users.name").where("users.id < 5")
+User.joins(:products).select("distinct users.name, users.id").where("users.id < 5")
+
+# total = the number of users
+  User.count
+
+# a = the number of users with a matching product
+  User.joins(:products).select("distinct users.id").count
+    #!! careful: using '.count' on a resultset with multiple columns returns wrong value
+        # as of Rails 3.2.13 on 2013-07-01
+    # for something like: User.joins(:products).select("distinct users.name, users.id")
+    # use '.length' instead
+
+# b = the number of users without a matching product
+  User.joins("LEFT OUTER JOIN products ON users.id = products.user_id").where(products: {id: nil}).count
+
+# total == a + b
+
+
+::: PLUCK
+# return an array of distinct strings:
+User.joins(:products).where("users.id < 5").pluck("DISTINCT users.name")
+
+# Rails 4 apparently supports plucking multiple columns
+# Prior to Rails 4, you can do:
+User.joins(:products).select("distinct users.name, users.id").where("users.id < 5").map { |e| [e.name, e.id] }
+
+
+
+____
+:::: Lec 02 - Just-in-Time SQL Queries
+
+
+
+____
+:::: Lec 03 - Preventing SQL Injection Attacks
+
+
+
+____
+:::: Lec 04 - Reading Ruby Documentation
+
+
+
+____
+:::: EXERCISE
+
+
+
+
+
+

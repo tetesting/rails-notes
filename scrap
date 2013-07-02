@@ -1,0 +1,46 @@
+scrap
+
+ActiveRecord
+
+ex. get previously saved changes in Rails
+
+user = User.last
+
+user.name = "john"
+puts user.name_changed?
+# => true
+
+puts user.changes
+# => {"name"=>["oldname", "john"]}
+
+user.save
+puts user.name_changed?
+# => false
+
+puts user.changes
+# => {}
+
+puts user.previous_changes
+# => {"name"=>["oldname", "john"], "updated_at"=>[Tue, 31 Jul 2012 18:53:12 UTC +00:00, Tue, 31 Jul 2012 18:56:49 UTC +00:00]}
+
+# !! note that object must still be in memory for changes and previous_changes to exist
+
+
+
+--- XSS
+inspect the HTML and add these as values to the new product price:
+1. some symbol like ';' or even nothing
+
+recover with this line in rails console:
+a = Product.first ; a.price = 0 ; a.save
+
+
+investigate sql injections...
+10%3BDELETE%20FROM%20users%20WHERE%20name%3D%273%27%3B
+
+User.new(name: 'aaa').save
+
+
+
+
+

@@ -4,26 +4,26 @@
 A)  User.where(:name => 'rich')
 
 
-
+___ class method
 
 
 
 B) @user.favorite_movie
 
-
+___ instance method
 
 
 C) [1,2,3,4].map {|x| x + 1 }
 
-
+___ instance method
 
 D) Hash.new
 
-
+___ class method
 
 E) "richard".upcase
 
-
+___ instance method
 
 
 
@@ -44,8 +44,8 @@ class Product
   end
 end
 
-
-
+___ self.highest_rated : class method
+___ rating : instance method
 
 
 
@@ -75,40 +75,39 @@ Returns HTML with the contents
 
 
 A) $('#thebest')
-
+___ "Ruby"
 
 B) $('.maybe')
-
+___ "python"
 
 C) $('.thebest')
-
+___ "javascript", "python"
 
 
 
 ## 3) In the example above how would you describe the relationship between `ul` & `li`? What about between `p` & `ul`?
 
+___ ul is the parent of li ; li is the child of ul
 
-
-
+___ p and ul are siblings
 
 
 ## 4) What folder do you put assets go in a Rails project?
 
-
-
-
+___ app/assets/stylesheets
+___ app/assets/javascripts
+___ app/assets/images
 
 
 ## 5) Describe what a callback function is, explain why you would want to use one? What is the alternative to a callback function?
 
-
-
-
-
+___ A callback function is a function that is passed as an argument to another function. It can be used inside of the containing function at a desired time. An alternative to the callback function is passing in the function call itself, in which we would have to wait for that function call to finish before the outer function can continue executing.
 
 
 
 
 ## 6) Give me one example of a DOM event. 
 
-
+___ a DOM event occurs when an event that a DOM element is listening to is triggered
+DOM elements listen to events by having eventListeners attached to them. They have an accompanying function with things to do when the event is triggered.
+An example of an event is "click".

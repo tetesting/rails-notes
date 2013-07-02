@@ -142,6 +142,8 @@ end
 
 # Since User-Product is a 1-n relationship,
 # User.joins(:products).count == Product.count - the number of products without users
+# which is equivalent to == Product.joins(:user)
+# NOTE the plural :products in the first statement and the singular :user in the second statment. This is due to the 1-n relationship!
 
 :: OUTER JOIN  (inclusive joins)
 # can join two tables, including all the records from one table even if it does not have any matches records in the other table
@@ -231,17 +233,79 @@ User.joins(:products).select("distinct users.name, users.id").where("users.id < 
 
 
 ____
-:::: Lec 02 - Just-in-Time SQL Queries
+:::: Lec 02 - Just-in-Time SQL Queries - Mix'n'Match ActiveRecord Queries
 
+# each method added to a query uses the output of the previous query as input
 
+# when do we call the database?
+
+# LazyLoading - we store the queries and run them as necessary
+
+# building SQL:
+  prods = Product.where(price: 5)
+  # => we are storing an ActiveRecord::Relation at this point
+  prods.class == ActiveRecord::Relation
+
+# methods that act on ActiveRecord::Relations, thus triggering SQL query:
+  first(), all(), count(), each(), 
+
+# so we can chain a bunch of methods to create sophisticated ActiveRecord::Relation's
+# ex. (none of the following are triggering SQL queries!)
+  a = Product.where 'price > 5'
+  b = a.where "LOWER(products.name) LIKE '%remote%'"
+  c = b.order :created_at
+  d = c.limit 55
+  e = d.joins :user
+  f = e.where(users: {name: 'john'})
+
+# After we've hit the database, the returning value is an Array or object, not a relation
+  puts f.first
+  puts f.all
+  puts f.count
+  puts f.each { |record| puts record.something }
+
+# Best to minimize the number of actual Database transactions/queries to optimize performance
 
 ____
 :::: Lec 03 - Preventing SQL Injection Attacks
+# used to attack databases
+# there is a vulnerability in your web app that enables users to send bad data to the server and compromise the database
 
+# ex.
+  name = 'richard'
+  puts "name = '#{name}'"
+  # => "name = 'richard'"
 
+  users = User.where("name = '#{name}'")
+  puts users.inspect
+  # seems fine so far...
+
+  ## let's attack that shit!
+  name = "' OR '1' = '1"
+  user = User.where("name = '#{name}'")
+    # => oh shit!
+    # we can close the string with a quote and add arbitrary SQL
+
+# How to protext ourselves?
+  # All of the statements we've created so far until the last example were safe to use
+  # By default, ActiveRecord protects you (through the ActiveRecord interface)
+    # ex. using the hash syntax (always safe)
+      name = "' OR '1' = 1"
+      User.where(name: name) 
+    # It escapes strings before using them
+  # If we need to use manual/custom SQL commands, we will use the '(?)'
+    # ex.
+      name = "' OR '1' = 1"
+      user = User.where("name = (?)", name).first
+      puts user
+      # => nil
+
+#!! BAD:  Using raw user input in our database without inspection
+  # Since this is all a pain to deal with yourself, use the ActiveRecord features!
 
 ____
-:::: Lec 04 - Reading Ruby Documentation
+:::: Lec 04 - Arrays and Reading Ruby Documentation
+
 
 
 

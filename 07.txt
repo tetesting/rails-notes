@@ -304,11 +304,45 @@ ____
   # Since this is all a pain to deal with yourself, use the ActiveRecord features!
 
 ____
-:::: Lec 04 - Arrays and Reading Ruby Documentation
+:::: Lec 04 - Reading Ruby Documentation
+
+http://ruby-doc.org
+- provides documentation with useful examples
+
+ex. Array
+http://ruby-doc.org/core-2.0/Array.html
+
+the left sidebar shows its Parent, Methods, and Modules
+
+notice that the parent is Object
+Object is actually the root parent of everything.
+
+The methods that begin with '::' are class methods
+The methods that begin with '#' are instance methods
 
 
+# some methods take optional arguments
+a = ['a','b','c','d','f','e','f']
+a.first
+a.first 3
 
+# some methods take optional blocks
+a = ['a','b','c','d','f','e','f']
+a.count
+a.count { |x| x == 'f' }
 
+# the '!' operator on methods
+# when you use methods like map!, it will modify the source array
+a = ['a','b','c','b']
+b = a.map { |x| 'foo:' + x }
+puts b.inspect
+ # => ["foo:a", "foo:b", "foo:c", "foo:b"]
+puts a.inspect
+ # => ['a', 'b', 'c', 'b']
+a.map! { |x| 'foo:' + x }
+puts a.inspect
+ # => ["foo:a", "foo:b", "foo:c", "foo:b"]
+ 
 ____
 :::: EXERCISE
 

@@ -346,8 +346,56 @@ puts a.inspect
 ____
 :::: EXERCISE
 
+topics:
+docs, arrays, testing, activerecord, hashes
 
+Array Methods:
+  Array#each
+  Array#map
+  Array#map!
+  Array#reject
+  Array#select
+  Array#&
+  Array#+
+  Array#-
+  Array#<<
+  Array#flatten
+  Array#uniq
+  Array#compact
+  Array#first
+  Array#last
+  Array#count
+  Enumerable#each_with_object
 
+ActiveRecord Methods:
+  find
+  where
+  includes
+  order
+  limit
+  offset
+  joins
+  group
+  having
 
+ActiveRecord Snippets:
+  group(:color).count
+  where(:id => ids)
+  where("condition LIKE (?)", "%good%")
+  where("id IN (?)", ids)
+  order("created_at ASC")
+  order("created_at DESC")
+  limit(22)
+  first(18)
+  limit(2).offset(2)
+  joins(:cars).where(:cars => {:top_speed => 55})
+  ("AVG(cars.top_speed) >= ?", 5)
 
+Hash Methods:
+  Hash#[]
+  Hash#[]=
+  Hash#keys
+  Hash#values
+  Hash#delete
+  Hash#merge
 
